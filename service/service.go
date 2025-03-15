@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"embed"
 	"log/slog"
 	"net/http"
@@ -33,7 +34,8 @@ func Start(router *http.ServeMux, logger *slog.Logger) {
 		if route.Auth {
 			handler = authMiddleware(handler).ServeHTTP
 		}
-		router.HandleFunc(methodAndPath, route.Handler)
+		router.HandleFunc(methodAndPath, handler)
+		svc.logger.LogAttrs(context.Background(), slog.LevelInfo, "Registered route", slog.String("methodAndPath", methodAndPath), slog.Bool("auth", route.Auth))
 	}
 }
 
@@ -48,6 +50,8 @@ func (s *Service) runTemplate(w http.ResponseWriter, r *http.Request, name strin
 func authMiddleware(next handlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
+
+		slog.LogAttrs(r.Context(), slog.LevelInfo, "Authorization header", slog.String("header", authHeader))
 
 		if authHeader == "" {
 			http.Error(w, "Unauthorized: Missing Authorization header", http.StatusUnauthorized)

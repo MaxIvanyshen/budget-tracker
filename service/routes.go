@@ -18,6 +18,18 @@ func (s *Service) routes() []Route {
 			Handler: s.handleSignup,
 			Auth:    false,
 		},
+		{
+			Method:  http.MethodPost,
+			Path:    "/signup",
+			Handler: s.handleUserRegistration,
+			Auth:    false,
+		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/dashboard",
+			Handler: s.handleDashboard,
+			Auth:    true,
+		},
 	}
 }
 
@@ -38,4 +50,14 @@ func (s *Service) handleIndex(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) handleSignup(w http.ResponseWriter, r *http.Request) {
 	s.runTemplate(w, r, "signup", Data{Paths: s.getPaths()})
+}
+
+func (s *Service) handleUserRegistration(w http.ResponseWriter, r *http.Request) {
+	//TODO: Implement user registration and add access token to response
+	r.Header.Set("Authorization", "Bearer access-token")
+	s.handleDashboard(w, r)
+}
+
+func (s *Service) handleDashboard(w http.ResponseWriter, r *http.Request) {
+	s.runTemplate(w, r, "dashboard", Data{Paths: s.getPaths()})
 }
