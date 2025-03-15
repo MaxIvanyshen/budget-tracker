@@ -1,0 +1,42 @@
+{{ block "navbar" .}}
+<!-- Navbar -->
+<nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <i class="fas fa-wallet text-indigo-600 text-2xl mr-2"></i>
+                    <span class="font-bold text-xl text-indigo-600">BudgetBuddy</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Features</a>
+                <a href="#dashboard" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Dashboard</a>
+                <a href="/signup" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{{end}}
+
+
+{{ block "footer" .}}
+<!-- Footer -->
+<footer class="bg-gray-800">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="md:flex md:items-center md:justify-between">
+            <div class="flex justify-center md:justify-start">
+                <div class="flex items-center text-white">
+                    <i class="fas fa-wallet text-2xl mr-2"></i>
+                    <span class="font-bold text-xl">BudgetBuddy</span>
+                </div>
+            </div>
+            <div class="mt-8 md:mt-0">
+                <p class="text-center text-base text-gray-400">
+                &copy; 2025 BudgetBuddy, Inc. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+{{end}}

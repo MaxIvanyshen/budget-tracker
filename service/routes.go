@@ -1,9 +1,7 @@
 package service
 
 import (
-	"log/slog"
 	"net/http"
-	"strconv"
 )
 
 func (s *Service) routes() []Route {
@@ -12,35 +10,32 @@ func (s *Service) routes() []Route {
 			Method:  http.MethodGet,
 			Path:    "/",
 			Handler: s.handleIndex,
+			Auth:    false,
 		},
 		{
-			Method:  http.MethodPost,
-			Path:    "/counter",
-			Handler: s.handleCounter,
+			Method:  http.MethodGet,
+			Path:    "/signup",
+			Handler: s.handleSignup,
+			Auth:    false,
 		},
 	}
 }
 
-func (s *Service) runTemplate(w http.ResponseWriter, r *http.Request, name string, data any) {
-	w.Header().Set("Content-Type", "text/html")
-	if err := s.tmpl.ExecuteTemplate(w, name, data); err != nil {
-		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to execute template", slog.Any("error", err))
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+func (s *Service) getPaths() []string {
+	routes := s.routes()
+	paths := make([]string, 0, len(routes))
+	for _, route := range routes {
+		if route.Method == http.MethodGet {
+			paths = append(paths, route.Path)
+		}
 	}
-}
-
-type data struct {
-	Name    string `json:"name"`
-	Counter int    `json:"counter"`
+	return paths
 }
 
 func (s *Service) handleIndex(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "index", data{Name: "World", Counter: 0})
+	s.runTemplate(w, r, "index", Data{Paths: s.getPaths()})
 }
 
-func (s *Service) handleCounter(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	count, _ := strconv.Atoi(r.FormValue("count"))
-	count++
-	s.runTemplate(w, r, "counter", data{Name: "World", Counter: count})
+func (s *Service) handleSignup(w http.ResponseWriter, r *http.Request) {
+	s.runTemplate(w, r, "signup", Data{Paths: s.getPaths()})
 }
