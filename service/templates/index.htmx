@@ -1,0 +1,24 @@
+{{ block "index" .}}
+<head>
+<script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<html>
+    <div>
+        hello {{ .Name }} 
+        {{ template "counter" . }}
+    </div>
+</html>
+{{end}}
+
+{{ block "counter" . }}
+    <button 
+        id="counter" 
+        hx-trigger="click" 
+        hx-target="#counter" 
+        hx-swap="outerHTML" 
+        hx-post="/counter"
+        hx-vals='{"count": "{{ .Counter }}"}'
+    >
+        {{ .Counter }}
+    </button>
+{{end}}
