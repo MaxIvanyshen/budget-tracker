@@ -85,6 +85,13 @@ func (s *Service) getUserID(w http.ResponseWriter, r *http.Request) (int64, erro
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 
+	_, err = s.queries.GetUserByID(r.Context(), userID)
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get user", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+
 	return userID, nil
 
 }
