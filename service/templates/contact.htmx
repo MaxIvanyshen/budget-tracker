@@ -33,13 +33,12 @@
                         <!-- Left side - Profile Image -->
                         <div class="md:w-1/3 bg-indigo-600">
                             <div class="h-full flex items-center justify-center p-8">
-                                <div class="bg-white rounded-full p-2 w-48 h-48 flex items-center justify-center">
-                                    <!-- Placeholder for profile image -->
-                                    <i class="fas fa-user-circle text-indigo-600 text-9xl"></i>
+                                <div class="bg-white rounded-full p-2 w-48 h-48 flex items-center justify-center overflow-hidden">
+                                    <!-- Actual profile image -->
+                                    <img src="https://avatars.githubusercontent.com/u/70772808?v=4" alt="Profile" class="object-cover w-full h-full rounded-full">
                                 </div>
                             </div>
                         </div>
-
                         <!-- Right side - Contact Info -->
                         <div class="md:w-2/3 p-8 md:p-12">
                             <h2 class="text-3xl font-bold text-gray-900 mb-4">Max Ivanyshen</h2>
@@ -70,7 +69,7 @@
                                 <div class="pt-6">
                                     <div class="flex space-x-5">
                                         <a href="https://x.com/fr0z_r" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-3 transition-colors">
-                                            <i class="fab fa-x text-xl"></i>
+                                            <i class="fab fa-twitter text-xl"></i>
                                         </a>
                                         <a href="https://www.linkedin.com/in/maxivanyshen/" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-3 transition-colors">
                                             <i class="fab fa-linkedin-in text-xl"></i>
