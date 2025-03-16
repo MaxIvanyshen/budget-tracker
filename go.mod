@@ -1,4 +1,4 @@
-module budget-tracker
+module github.com/MaxIvanyshen/budget-tracker
 
 go 1.23.6
 

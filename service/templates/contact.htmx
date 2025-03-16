@@ -1,0 +1,154 @@
+{{ block "contact" . }}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contact | BudgetBuddy</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Favicon matching the wallet icon -->
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
+    </head>
+    <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex flex-col overflow-x-hidden">
+        {{ template "navbar" . }}
+
+        <!-- Hero Section -->
+        <div class="bg-indigo-700 text-white">
+            <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl font-extrabold sm:text-5xl sm:tracking-tight lg:text-6xl">Get in Touch</h1>
+                    <p class="mt-6 max-w-2xl mx-auto text-xl">Have questions or feedback about BudgetBuddy? I'd love to hear from you.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section - New Design -->
+        <div class="flex-grow py-16 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Profile Card -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-10">
+                    <div class="md:flex">
+                        <!-- Left side - Profile Image -->
+                        <div class="md:w-1/3 bg-indigo-600">
+                            <div class="h-full flex items-center justify-center p-8">
+                                <div class="bg-white rounded-full p-2 w-48 h-48 flex items-center justify-center">
+                                    <!-- Placeholder for profile image -->
+                                    <i class="fas fa-user-circle text-indigo-600 text-9xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Contact Info -->
+                        <div class="md:w-2/3 p-8 md:p-12">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">Max Ivanyshen</h2>
+                            <p class="text-xl text-gray-600 mb-8">Web Developer</p>
+
+                            <div class="space-y-6">
+                                <!-- Email -->
+                                <div class="flex items-center">
+                                    <div class="bg-indigo-100 rounded-full p-3 mr-4">
+                                        <i class="fas fa-envelope text-indigo-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <a href="mailto:maxivanyshen@gmail.com" class="text-indigo-600 hover:text-indigo-800 text-lg">maxivanyshen@gmail.com</a>
+                                    </div>
+                                </div>
+
+                                <!-- GitHub -->
+                                <div class="flex items-center">
+                                    <div class="bg-indigo-100 rounded-full p-3 mr-4">
+                                        <i class="fab fa-github text-indigo-600 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <a href="https://github.com/MaxIvanyshen" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-lg">github.com/MaxIvanyshen</a>
+                                    </div>
+                                </div>
+
+                                <!-- Social Links -->
+                                <div class="pt-6">
+                                    <div class="flex space-x-5">
+                                        <a href="https://x.com/fr0z_r" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-3 transition-colors">
+                                            <i class="fab fa-x text-xl"></i>
+                                        </a>
+                                        <a href="https://www.linkedin.com/in/maxivanyshen/" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-3 transition-colors">
+                                            <i class="fab fa-linkedin-in text-xl"></i>
+                                        </a>
+                                        <a href="https://www.instagram.com/fr0z_r/" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 rounded-full p-3 transition-colors">
+                                            <i class="fab fa-instagram text-xl"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Section: Map and Contact Form -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <!-- Map Column -->
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <div class="p-6 bg-indigo-600 text-white">
+                            <h2 class="text-2xl font-bold">My Location</h2>
+                        </div>
+                        <!-- Map container with aspect ratio preservation -->
+                        <div class="relative w-full h-[350px] md:h-auto md:pb-[120%]">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2605.242912374598!2d28.40858847705305!3d49.23388357138558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x472d5c5eb3978a07%3A0x591bf4ded045dfa!2z0JLRltC90L3QuNGG0YzQutC40Lkg0L3QsNGG0ZbQvtC90LDQu9GM0L3QuNC5INGC0LXRhdC90ZbRh9C90LjQuSDRg9C90ZbQstC10YDRgdC40YLQtdGC!5e0!3m2!1suk!2sua!4v1742081796834!5m2!1suk!2sua" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                                allowfullscreen="" 
+                                loading="lazy"
+                                title="Вінницький національний технічний університет">
+                            </iframe>
+                        </div>
+                    </div>
+                    <!-- Contact Form Column -->
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <div class="p-6 bg-indigo-600 text-white">
+                            <h2 class="text-2xl font-bold">Send Me a Message</h2>
+                        </div>
+                        <div id="form" class="p-8">
+                            <form hx-post="/send-contact-form" hx-targer="#form" hx-trigger="submit" class="space-y-6">
+                                <div>
+                                    <label for="fullname" class="block text-gray-700 mb-1">Full name</label>
+                                    <input type="text" name="fullname" id="fullname" autocomplete="name" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label for="email" class="block text-gray-700 mb-1">Email</label>
+                                    <input type="email" name="email" id="email" autocomplete="email" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label for="subject" class="block text-gray-700 mb-1">Subject</label>
+                                    <input type="text" name="subject" id="subject" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label for="message" class="block text-gray-700 mb-1">Message</label>
+                                    <textarea id="message" name="message" rows="12" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"></textarea>
+                                </div>
+
+                                <div>
+                                    <button type="submit" 
+                                        class="w-full flex justify-center items-center py-3 px-6 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                        </svg>
+                                        Send Message
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+    </body>
+</html>
+{{end}}

@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"net/http"
 	"text/template"
+
+	"github.com/MaxIvanyshen/budget-tracker/types"
 )
 
 //go:embed templates
 var templates embed.FS
-
-type handlerFunc func(http.ResponseWriter, *http.Request)
 
 type Service struct {
 	router *http.ServeMux
@@ -47,7 +47,7 @@ func (s *Service) runTemplate(w http.ResponseWriter, r *http.Request, name strin
 	}
 }
 
-func authMiddleware(next handlerFunc) http.Handler {
+func authMiddleware(next types.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 

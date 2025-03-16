@@ -11,7 +11,8 @@
             </div>
             <div class="flex items-center space-x-4">
                 <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Features</a>
-                <a href="#dashboard" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Dashboard</a>
+                <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Features</a>
+                <a href="/contact" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Contact</a>
                 <a href="/signup" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">Sign Up</a>
             </div>
         </div>
@@ -21,20 +22,38 @@
 
 
 {{ block "footer" .}}
-<!-- Footer -->
-<footer class="bg-gray-800">
-    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div class="md:flex md:items-center md:justify-between">
-            <div class="flex justify-center md:justify-start">
-                <div class="flex items-center text-white">
-                    <i class="fas fa-wallet text-2xl mr-2"></i>
-                    <span class="font-bold text-xl">BudgetBuddy</span>
+<footer class="bg-gray-800 mt-16 w-full">
+    <!-- Outer container with no width restrictions -->
+    <div class="w-full py-12">
+        <!-- Inner container for centered content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:justify-start">
+                    <div class="flex items-center text-white">
+                        <i class="fas fa-wallet text-2xl mr-2"></i>
+                        <span class="font-bold text-xl">BudgetBuddy</span>
+                    </div>
                 </div>
-            </div>
-            <div class="mt-8 md:mt-0">
-                <p class="text-center text-base text-gray-400">
-                &copy; 2025 BudgetBuddy, Inc. All rights reserved.
-                </p>
+                <div class="mt-8 md:mt-0">
+                    <p class="text-center text-base text-gray-400">
+                        &copy; 2025 BudgetBuddy, Inc. All rights reserved.
+                    </p>
+                </div>
+                <!-- Social media icons -->
+                <div class="flex space-x-6 mt-8 md:mt-0 justify-center">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-wallet text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-wallet text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-wallet text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-wallet text-lg"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

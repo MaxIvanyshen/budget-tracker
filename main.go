@@ -1,12 +1,13 @@
 package main
 
 import (
-	"budget-tracker/service"
 	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+
+	"github.com/MaxIvanyshen/budget-tracker/service"
 
 	"github.com/joho/godotenv"
 )
