@@ -99,9 +99,9 @@
                     <input id="terms-and-privacy" name="terms-and-privacy" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" required>
                     <label for="terms-and-privacy" class="ml-2 block text-sm text-gray-900">
                         I agree to the 
-                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a>
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a>
                         and
-                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
                     </label>
                 </div>
 
