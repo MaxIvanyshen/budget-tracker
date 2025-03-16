@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -24,6 +25,11 @@ func (s *Service) routes() []types.Route {
 			Method:  http.MethodPost,
 			Path:    "/signup",
 			Handler: s.handleUserRegistration,
+		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/login",
+			Handler: s.handleLogin,
 		},
 		{
 			Method:  http.MethodGet,
@@ -55,26 +61,69 @@ func (s *Service) getPaths() []string {
 	return paths
 }
 
+func (s *Service) buildData(r *http.Request) types.Data {
+	data := types.Data{
+		Paths: s.getPaths(),
+	}
+	session, err := s.sessionStore.Get(r, "auth-session")
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get session", slog.Any("error", err))
+	}
+	if id, ok := session.Values["userId"].(int64); ok {
+		data.UserID = id
+	}
+	return data
+}
+
 func (s *Service) handleIndex(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "index", types.Data{Paths: s.getPaths()})
+	s.runTemplate(w, r, "index", s.buildData(r))
 }
 
 func (s *Service) handleSignup(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "signup", types.Data{Paths: s.getPaths()})
+	s.runTemplate(w, r, "signup", s.buildData(r))
 }
 
 func (s *Service) handleUserRegistration(w http.ResponseWriter, r *http.Request) {
-	//TODO: Implement user registration and add access token to response
-	r.Header.Set("Authorization", "Bearer access-token")
-	s.handleDashboard(w, r)
+	err := r.ParseForm()
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to parse form", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	user, err := s.registerUser(r.Context(), r.Form)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf(types.Error, err.Error())))
+		return
+	}
+	session, err := s.sessionStore.Get(r, "auth-session")
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get session", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	session.Values["authenticated"] = true
+	session.Values["userId"] = user.ID
+	session.Save(r, w)
+	w.Write([]byte(`
+        <script>
+            window.location.href = "/dashboard";
+        </script>
+    `))
 }
 
 func (s *Service) handleDashboard(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "dashboard", types.Data{Paths: s.getPaths()})
+	userID, err := s.getUserID(w, r)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	s.logger.LogAttrs(r.Context(), slog.LevelInfo, "User ID", slog.Int64("userID", userID))
+
+	s.runTemplate(w, r, "dashboard", s.buildData(r))
 }
 
 func (s *Service) handleContact(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "contact", types.Data{Paths: s.getPaths()})
+	s.runTemplate(w, r, "contact", s.buildData(r))
 }
 
 func (s *Service) handleSendContactMsg(w http.ResponseWriter, r *http.Request) {
@@ -98,15 +147,9 @@ func (s *Service) handleSendContactMsg(w http.ResponseWriter, r *http.Request) {
 		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to send message", slog.Any("error", err))
 	}
 
-	successHTML := `
-  <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
-      <p class="font-bold">Success!</p>
-      <p>Your message has been sent. We'll get back to you shortly.</p>
-  </div>
-  <div id="fullname" hx-swap-oob="true"><input type="text" name="fullname" value="" /></div>
-  <div id="email" hx-swap-oob="true"><input type="email" name="email" value="" /></div>
-  <div id="subject" hx-swap-oob="true"><input type="text" name="subject" value="" /></div>
-  <div id="message" hx-swap-oob="true"><textarea name="message"></textarea></div>
-`
-	w.Write([]byte(successHTML))
+	w.Write([]byte(types.SupportFormSuccess))
+}
+
+func (s *Service) handleLogin(w http.ResponseWriter, r *http.Request) {
+	s.runTemplate(w, r, "signup", s.buildData(r))
 }

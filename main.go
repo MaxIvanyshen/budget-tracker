@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/MaxIvanyshen/budget-tracker/database"
 	"github.com/MaxIvanyshen/budget-tracker/service"
 
 	"github.com/joho/godotenv"
@@ -21,7 +22,13 @@ func main() {
 		logger.LogAttrs(ctx, slog.LevelError, "Failed to load .env file", slog.Any("error", err))
 	}
 
-	service.Start(router, logger)
+	db, err := database.New(ctx)
+	if err != nil {
+		logger.LogAttrs(ctx, slog.LevelError, "Failed to connect to database", slog.Any("error", err))
+		return
+	}
+
+	service.Start(router, logger, db)
 
 	port := os.Getenv("PORT")
 

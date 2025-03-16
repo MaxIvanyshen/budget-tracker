@@ -7,6 +7,8 @@
     <title>Sign Up | BudgetBuddy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <!-- Favicon matching the wallet icon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
 </head>
@@ -32,7 +34,7 @@
                     </a>
                 </p>
             </div>
-            <form class="mt-8 space-y-6" action="#" method="POST">
+            <form class="mt-8 space-y-6" hx-post="/signup" hx-target="#password-validation">
                 <div class="rounded-md shadow-sm space-y-4">
                     <div>
                         <label for="full-name" class="sr-only">Full name</label>
@@ -40,7 +42,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-user text-gray-400"></i>
                             </div>
-                            <input id="full-name" name="name" type="text" required class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Full name">
+                            <input id="full-name" name="name" type="text" class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Full name">
                         </div>
                     </div>
                     <div>
@@ -49,7 +51,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-envelope text-gray-400"></i>
                             </div>
-                            <input id="email-address" name="email" type="email" autocomplete="email" required class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address">
+                            <input id="email-address" name="email" type="email" autocomplete="email" class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address">
                         </div>
                     </div>
                     <div>
@@ -58,7 +60,10 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-lock text-gray-400"></i>
                             </div>
-                            <input id="password" name="password" type="password" autocomplete="new-password" required class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Password">
+                            <input id="password" name="password" type="password" autocomplete="new-password" 
+                                class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                                placeholder="Password"
+                                hx-trigger="input">
                         </div>
                     </div>
                     <div>
@@ -67,8 +72,13 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-check-double text-gray-400"></i>
                             </div>
-                            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Confirm password">
+                            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" 
+                                class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
+                                placeholder="Confirm password"
+                                hx-trigger="input">
                         </div>
+                        <!-- Password validation message container -->
+                        <div id="password-validation" class="mt-1 text-sm"></div>
                     </div>
                 </div>
 
@@ -76,9 +86,9 @@
                     <input id="terms-and-privacy" name="terms-and-privacy" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" required>
                     <label for="terms-and-privacy" class="ml-2 block text-sm text-gray-900">
                         I agree to the 
-                        <a href="#" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a>
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" class="text-indigo-600 hover:text-indigo-500">Terms of Service</a>
                         and
-                        <a href="#" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" class="text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
                     </label>
                 </div>
 
@@ -102,12 +112,12 @@
                     </div>
                 </div>
 
-                    <div>
-                        <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                            <i class="fab fa-google text-lg"></i>
-                            <span class="ml-2">Google</span>
-                        </a>
-                    </div>
+                <div>
+                    <a href="#" class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <i class="fab fa-google text-lg"></i>
+                        <span class="ml-2">Google</span>
+                    </a>
+                </div>
             </div>
 
         </div>
@@ -116,3 +126,4 @@
 </body>
 </html>
 {{end}}
+

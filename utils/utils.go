@@ -3,12 +3,16 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/MaxIvanyshen/budget-tracker/types"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func SendTelegramMessage(msg types.SupportMsg) error {
@@ -50,4 +54,37 @@ func SendTelegramMessage(msg types.SupportMsg) error {
 
 func buildMessage(msg types.SupportMsg) (string, error) {
 	return fmt.Sprintf("Name: *%s*\nEmail: *%s*\nSubject: *%s*\nMessage: *%s*", msg.Name, msg.Email, msg.Subject, msg.Message), nil
+}
+
+var secretKey = []byte(os.Getenv("JWT_SECRET"))
+
+func GenerateJWT(userEmail string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"email": userEmail,
+			"exp":   time.Now().Add(time.Hour * 24 * 14).Unix(),
+		})
+
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func ValidatePassword(password string) error {
+	if len(password) < 8 {
+		return fmt.Errorf("password must be at least 8 characters long")
+	}
+	if !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		return errors.New("password must contain at least one uppercase letter")
+	}
+	if !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") {
+		return errors.New("password must contain at least one lowercase letter")
+	}
+	if !strings.ContainsAny(password, "0123456789") {
+		return errors.New("password must contain at least one digit")
+	}
+	return nil
 }
