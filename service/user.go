@@ -47,21 +47,35 @@ func (s *Service) registerUser(ctx context.Context, form url.Values) (*sqlc.User
 		return nil, errors.New("User with this email already exists")
 	}
 
-	accessToken, err := utils.GenerateJWT(email)
-	if err != nil {
-		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to generate JWT", slog.Any("error", err))
-		return nil, errors.New("Failed to generate JWT")
-	}
-
 	user, err := s.queries.CreateUser(ctx, &sqlc.CreateUserParams{
-		Name:        name,
-		Password:    password,
-		Email:       email,
-		AccessToken: accessToken,
+		Name:     name,
+		Password: password,
+		Email:    email,
 	})
 	if err != nil {
 		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to create user", slog.Any("error", err))
 		return nil, errors.New("Failed to create user")
 	}
+	return user, nil
+}
+
+func (s *Service) loginUser(ctx context.Context, form url.Values) (*sqlc.Users, error) {
+	email := form.Get("email")
+	password := form.Get("password")
+
+	if email == "" || password == "" {
+		return nil, errors.New("All fields are required")
+	}
+
+	user, err := s.queries.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, errors.New("User not found")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, errors.New("Invalid email or password")
+	}
+
 	return user, nil
 }

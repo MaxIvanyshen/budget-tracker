@@ -32,6 +32,11 @@ func (s *Service) routes() []types.Route {
 			Handler: s.handleLogin,
 		},
 		{
+			Method:  http.MethodPost,
+			Path:    "/login",
+			Handler: s.handleUserLogin,
+		},
+		{
 			Method:  http.MethodGet,
 			Path:    "/logout",
 			Handler: s.handleLogout,
@@ -85,7 +90,12 @@ func (s *Service) handleIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) handleSignup(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "signup", s.buildData(r))
+	data := s.buildData(r)
+	if data.UserID != 0 {
+		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+		return
+	}
+	s.runTemplate(w, r, "signup", data)
 }
 
 func (s *Service) handleUserRegistration(w http.ResponseWriter, r *http.Request) {
@@ -117,13 +127,6 @@ func (s *Service) handleUserRegistration(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *Service) handleDashboard(w http.ResponseWriter, r *http.Request) {
-	userID, err := s.getUserID(w, r)
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-	s.logger.LogAttrs(r.Context(), slog.LevelInfo, "User ID", slog.Int64("userID", userID))
-
 	s.runTemplate(w, r, "dashboard", s.buildData(r))
 }
 
@@ -156,7 +159,40 @@ func (s *Service) handleSendContactMsg(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) handleLogin(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "signup", s.buildData(r))
+	data := s.buildData(r)
+	if data.UserID != 0 {
+		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+		return
+	}
+	s.runTemplate(w, r, "login", data)
+}
+
+func (s *Service) handleUserLogin(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to parse form", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	user, err := s.loginUser(r.Context(), r.Form)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf(types.Error, err.Error())))
+		return
+	}
+	session, err := s.sessionStore.Get(r, "auth-session")
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get session", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	session.Values["authenticated"] = true
+	session.Values["userId"] = user.ID
+	session.Save(r, w)
+	w.Write([]byte(`
+        <script>
+            window.location.href = "/dashboard";
+        </script>
+    `))
 }
 
 func (s *Service) handleLogout(w http.ResponseWriter, r *http.Request) {
