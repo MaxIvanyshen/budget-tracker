@@ -2,3 +2,4 @@
 # Air hot reload artifacts
 bin/
 tmp/
+budget_buddy.db
