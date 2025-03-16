@@ -33,6 +33,11 @@ func (s *Service) routes() []types.Route {
 		},
 		{
 			Method:  http.MethodGet,
+			Path:    "/logout",
+			Handler: s.handleLogout,
+		},
+		{
+			Method:  http.MethodGet,
 			Path:    "/dashboard",
 			Handler: s.handleDashboard,
 			Auth:    true,
@@ -152,4 +157,17 @@ func (s *Service) handleSendContactMsg(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) handleLogin(w http.ResponseWriter, r *http.Request) {
 	s.runTemplate(w, r, "signup", s.buildData(r))
+}
+
+func (s *Service) handleLogout(w http.ResponseWriter, r *http.Request) {
+	session, err := s.sessionStore.Get(r, "auth-session")
+	if err != nil {
+		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get session", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	session.Values["authenticated"] = false
+	delete(session.Values, "userId")
+	session.Save(r, w)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
