@@ -7,16 +7,13 @@
     <title>Sign Up | BudgetBuddy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Add HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-    <!-- Favicon matching the wallet icon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
     {{ template "toggle-password" . }}
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex flex-col">
     {{ template "navbar" . }}
 
-    <!-- Signup Form -->
     <div class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md">
             <div>
@@ -65,7 +62,6 @@
                                 class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
                                 placeholder="Password"
                                 hx-trigger="input">
-                            <!-- For main password field -->
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <button type="button" id="toggle-password" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                                     <i class="fas fa-eye"></i>
@@ -83,14 +79,12 @@
                                 class="appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" 
                                 placeholder="Confirm password"
                                 hx-trigger="input">
-                            <!-- For confirm password field -->
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <button type="button" id="toggle-confirm-password" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
-                        <!-- Password validation message container -->
                         <div id="error" class="mt-1 text-sm"></div>
                     </div>
                 </div>
