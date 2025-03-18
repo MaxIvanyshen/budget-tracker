@@ -9,9 +9,18 @@
                     <span class="font-bold text-xl text-indigo-600">BudgetBuddy</span>
                 </a>
             </div>
-            <div class="flex items-center space-x-4">
+            
+            <!-- Mobile menu button -->
+            <div class="flex items-center md:hidden">
+                <button id="mobile-menu-button" type="button" class="text-gray-500 hover:text-indigo-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Desktop menu -->
+            <div class="hidden md:flex items-center space-x-4">
                 <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Features</a>
-                <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Features</a>
+                <a href="#pricing" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Pricing</a>
                 <a href="/contact" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Contact</a>
                 {{ if eq .UserID 0 }}
                 <a href="/signup" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">Sign Up</a>
@@ -19,7 +28,60 @@
             </div>
         </div>
     </div>
+    
+    <!-- Mobile menu, show/hide based on menu state -->
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
+            <a href="#features" class="block text-gray-600 hover:text-indigo-600 px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-indigo-600">Features</a>
+            <a href="#pricing" class="block text-gray-600 hover:text-indigo-600 px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-indigo-600">Pricing</a>
+            <a href="/contact" class="block text-gray-600 hover:text-indigo-600 px-3 py-2 text-base font-medium border-l-4 border-transparent hover:border-indigo-600">Contact</a>
+            {{ if eq .UserID 0 }}
+            <a href="/signup" class="block text-indigo-600 font-medium px-3 py-2 text-base border-l-4 border-indigo-600">Sign Up</a>
+            {{end}}
+        </div>
+    </div>
 </nav>
+
+<!-- JavaScript for mobile menu toggle -->
+<script>
+    // Execute immediately without waiting for DOMContentLoaded
+    (function() {
+        // Get the elements
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (!mobileMenuButton || !mobileMenu) {
+            console.error('Mobile menu elements not found');
+            return;
+        }
+        
+        // Add click event listener to the button
+        mobileMenuButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Toggle the menu visibility
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenuButton.innerHTML = '<i class="fas fa-times text-xl"></i>';
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!mobileMenu.classList.contains('hidden') && 
+                !mobileMenu.contains(e.target) && 
+                !mobileMenuButton.contains(e.target)) {
+                
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
+            }
+        });
+    })(); // Self-executing function
+</script>
 {{end}}
 
 
@@ -43,17 +105,14 @@
                 </div>
                 <!-- Social media icons -->
                 <div class="flex space-x-6 mt-8 md:mt-0 justify-center">
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i class="fas fa-wallet text-lg"></i>
+                    <a href="https://x.com/fr0z_r" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-twitter text-lg"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i class="fas fa-wallet text-lg"></i>
+                    <a href="https://www.linkedin.com/in/maxivanyshen/" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-linkedin-in text-lg"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i class="fas fa-wallet text-lg"></i>
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white">
-                        <i class="fas fa-wallet text-lg"></i>
+                    <a href="https://www.instagram.com/fr0z_r/" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram text-lg"></i>
                     </a>
                 </div>
             </div>
