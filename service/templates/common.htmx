@@ -42,11 +42,8 @@
     </div>
 </nav>
 
-<!-- JavaScript for mobile menu toggle -->
 <script>
-    // Execute immediately without waiting for DOMContentLoaded
     (function() {
-        // Get the elements
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         
@@ -55,12 +52,10 @@
             return;
         }
         
-        // Add click event listener to the button
         mobileMenuButton.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            // Toggle the menu visibility
             if (mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.remove('hidden');
                 mobileMenuButton.innerHTML = '<i class="fas fa-times text-xl"></i>';
@@ -70,7 +65,6 @@
             }
         });
         
-        // Close menu when clicking outside
         document.addEventListener('click', function(e) {
             if (!mobileMenu.classList.contains('hidden') && 
                 !mobileMenu.contains(e.target) && 
@@ -80,16 +74,14 @@
                 mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
             }
         });
-    })(); // Self-executing function
+    })();
 </script>
 {{end}}
 
 
 {{ block "footer" .}}
 <footer class="bg-gray-800 mt-16 w-full">
-    <!-- Outer container with no width restrictions -->
     <div class="w-full py-12">
-        <!-- Inner container for centered content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex justify-center md:justify-start">
@@ -103,7 +95,6 @@
                         &copy; 2025 BudgetBuddy, Inc. All rights reserved.
                     </p>
                 </div>
-                <!-- Social media icons -->
                 <div class="flex space-x-6 mt-8 md:mt-0 justify-center">
                     <a href="https://x.com/fr0z_r" target="_blank" class="text-gray-400 hover:text-white">
                         <i class="fab fa-twitter text-lg"></i>
@@ -124,7 +115,6 @@
 {{ block "toggle-password" . }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle main password visibility
     document.getElementById('toggle-password').addEventListener('click', function() {
         const passwordInput = document.getElementById('password');
         const eyeIcon = this.querySelector('i');
@@ -140,7 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Toggle confirm password visibility
     document.getElementById('toggle-confirm-password').addEventListener('click', function() {
         const confirmPasswordInput = document.getElementById('confirm-password');
         const eyeIcon = this.querySelector('i');
