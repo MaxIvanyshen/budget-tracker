@@ -1,6 +1,11 @@
 package types
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/MaxIvanyshen/budget-tracker/database/sqlc"
+)
 
 type HandlerFunc func(http.ResponseWriter, *http.Request)
 
@@ -22,6 +27,16 @@ var (
     `
 )
 
+func Redirect(path string) string {
+	return fmt.Sprintf(`
+        <script>
+            window.location.href = "%s";
+        </script>
+        `,
+		path,
+	)
+}
+
 type Route struct {
 	Method  string
 	Path    string
@@ -30,16 +45,9 @@ type Route struct {
 }
 
 type Data struct {
-	Paths  []string
-	UserID int64
-}
-
-type User struct {
-	ID        int64
-	FirstName string
-	LastName  string
-	Email     string
-	Password  string
+	Paths          []string
+	User           *sqlc.Users
+	AdditionalData map[string]any
 }
 
 type SupportMsg struct {

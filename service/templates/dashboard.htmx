@@ -1,4 +1,4 @@
-{{ block "dashboard" . }}
+{{ block "dashboard" .}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,10 +8,383 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
     {{ template "navbar" . }}
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-indigo-600 rounded-xl shadow-lg mb-8">
+            <div class="px-6 py-8 md:flex md:items-center md:justify-between">
+                <div class="text-white">
+                    <h1 class="text-2xl font-bold">Welcome back, {{ index .AdditionalData "firstname" }}!</h1>
+                    <p class="mt-1 text-indigo-100">Your financial summary for March 2025</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                <a href="/income" class="bg-white text-green-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-green-50 transition-colors"><i class="fas fa-plus mr-2"></i>Add Income</a>
+                <a href="/expenses" class="bg-white text-red-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-red-50 transition-colors"><i class="fas fa-minus mr-2"></i>Add Expense</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-indigo-100 p-3 rounded-full">
+                        <i class="fas fa-wallet text-indigo-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Total Balance</p>
+                        <h3 class="text-2xl font-bold text-gray-900">$4,240.50</h3>
+                    </div>
+                </div>
+                <div class="mt-3 text-sm text-green-600">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    <span>12% from last month</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-arrow-down text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Income</p>
+                        <h3 class="text-2xl font-bold text-gray-900">$2,840.00</h3>
+                    </div>
+                </div>
+                <div class="mt-3 text-sm text-green-600">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    <span>8% from last month</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-arrow-up text-red-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Expenses</p>
+                        <h3 class="text-2xl font-bold text-gray-900">$1,250.30</h3>
+                    </div>
+                </div>
+                <div class="mt-3 text-sm text-red-600">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    <span>5% from last month</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fas fa-piggy-bank text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Savings</p>
+                        <h3 class="text-2xl font-bold text-gray-900">$1,589.70</h3>
+                    </div>
+                </div>
+                <div class="mt-3 text-sm text-green-600">
+                    <i class="fas fa-arrow-up mr-1"></i>
+                    <span>18% from last month</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-gray-900">Monthly Overview</h2>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-gray-900">Recent Transactions</h2>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-blue-100 p-3 rounded-full">
+                                    <i class="fas fa-shopping-cart text-blue-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-medium">Whole Foods Market</p>
+                                    <p class="text-sm text-gray-500">Mar 18, 2025 • Groceries</p>
+                                </div>
+                            </div>
+                            <span class="font-medium text-red-600">-$86.42</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-purple-100 p-3 rounded-full">
+                                    <i class="fas fa-film text-purple-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-medium">Netflix Subscription</p>
+                                    <p class="text-sm text-gray-500">Mar 16, 2025 • Entertainment</p>
+                                </div>
+                            </div>
+                            <span class="font-medium text-red-600">-$14.99</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 p-3 rounded-full">
+                                    <i class="fas fa-building text-green-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-medium">Salary Deposit</p>
+                                    <p class="text-sm text-gray-500">Mar 15, 2025 • Income</p>
+                                </div>
+                            </div>
+                            <span class="font-medium text-green-600">+$2,840.00</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-yellow-100 p-3 rounded-full">
+                                    <i class="fas fa-utensils text-yellow-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-medium">Cheesecake Factory</p>
+                                    <p class="text-sm text-gray-500">Mar 14, 2025 • Dining</p>
+                                </div>
+                            </div>
+                            <span class="font-medium text-red-600">-$58.73</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-red-100 p-3 rounded-full">
+                                    <i class="fas fa-home text-red-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="font-medium">Rent Payment</p>
+                                    <p class="text-sm text-gray-500">Mar 10, 2025 • Housing</p>
+                                </div>
+                            </div>
+                            <span class="font-medium text-red-600">-$1,200.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-8">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-gray-900">Budget Progress</h2>
+                        <span class="text-sm text-gray-500">Mar 1 - Mar 31</span>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Groceries</span>
+                                <span class="text-sm font-medium text-gray-700">$420 / $500</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-green-600 h-2.5 rounded-full" style="width: 84%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Dining Out</span>
+                                <span class="text-sm font-medium text-gray-700">$280 / $300</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 93%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Entertainment</span>
+                                <span class="text-sm font-medium text-gray-700">$120 / $200</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Transportation</span>
+                                <span class="text-sm font-medium text-gray-700">$180 / $250</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 72%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Shopping</span>
+                                <span class="text-sm font-medium text-gray-700">$250 / $200</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-red-600 h-2.5 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-gray-900">Savings Goals</h2>
+                        <button class="text-sm text-indigo-600 hover:text-indigo-800">
+                            <i class="fas fa-plus mr-1"></i> Add Goal
+                        </button>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium">Vacation Fund</span>
+                                <span class="text-sm text-gray-600">$2,400 / $5,000</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 48%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>48% complete</span>
+                                <span>Target: Dec 2025</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium">New Car</span>
+                                <span class="text-sm text-gray-600">$8,500 / $20,000</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 42.5%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>42.5% complete</span>
+                                <span>Target: Aug 2026</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="font-medium">Emergency Fund</span>
+                                <span class="text-sm text-gray-600">$4,800 / $6,000</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div class="bg-green-600 h-2.5 rounded-full" style="width: 80%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>80% complete</span>
+                                <span>Target: May 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-gray-900">Spending by Category</h2>
+                        <span class="text-sm text-gray-500">March 2025</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     {{ template "footer" . }}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Monthly Overview Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            const monthlyChart = new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: [2450, 2320, 2840, 0, 0, 0],
+                            backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [1820, 1950, 1250, 0, 0, 0],
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Category Spending Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Housing', 'Groceries', 'Dining', 'Entertainment', 'Transportation', 'Shopping'],
+                    datasets: [{
+                        data: [1200, 420, 280, 120, 180, 250],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(236, 72, 153, 0.8)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 {{end}}
+
