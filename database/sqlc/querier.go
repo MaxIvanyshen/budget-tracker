@@ -9,8 +9,19 @@ import (
 )
 
 type Querier interface {
+	CreateTransaction(ctx context.Context, arg *CreateTransactionParams) (*Transactions, error)
 	CreateUser(ctx context.Context, arg *CreateUserParams) (*Users, error)
+	DeleteTransactionByIDAndUserID(ctx context.Context, arg *DeleteTransactionByIDAndUserIDParams) error
 	DeleteUser(ctx context.Context, id int64) error
+	GetLatestTransactionsByUserID(ctx context.Context, userID int64) ([]*Transactions, error)
+	GetLatestTransactionsByUserIDAndTransactionType(ctx context.Context, arg *GetLatestTransactionsByUserIDAndTransactionTypeParams) ([]*Transactions, error)
+	GetTotalTransactionsByUserIDAndTransactionTypeForLastMonth(ctx context.Context, arg *GetTotalTransactionsByUserIDAndTransactionTypeForLastMonthParams) (*float64, error)
+	GetTotalTransactionsByUserIDAndTransactionTypeForThisMonth(ctx context.Context, arg *GetTotalTransactionsByUserIDAndTransactionTypeForThisMonthParams) (*float64, error)
+	GetTotalTransactionsThisYearByUserIDAndTransactionType(ctx context.Context, arg *GetTotalTransactionsThisYearByUserIDAndTransactionTypeParams) (*float64, error)
+	GetTransactionByID(ctx context.Context, id int64) (*Transactions, error)
+	GetTransactionsByUserID(ctx context.Context, userID int64) ([]*Transactions, error)
+	GetTransactionsByUserIDAndTransactionType(ctx context.Context, arg *GetTransactionsByUserIDAndTransactionTypeParams) ([]*Transactions, error)
+	GetTransactionsCountByUserIDAndTransactionType(ctx context.Context, arg *GetTransactionsCountByUserIDAndTransactionTypeParams) (int64, error)
 	GetUserByEmail(ctx context.Context, email string) (*Users, error)
 	GetUserByID(ctx context.Context, id int64) (*Users, error)
 	UpdateUser(ctx context.Context, arg *UpdateUserParams) (*Users, error)

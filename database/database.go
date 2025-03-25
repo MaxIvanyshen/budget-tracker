@@ -9,6 +9,13 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
+type TransactionType int
+
+const (
+	TransactionTypeIncome  TransactionType = 1
+	TransactionTypeExpense TransactionType = 2
+)
+
 func New(ctx context.Context) (*sql.DB, error) {
 	dbName := os.Getenv("DB_NAME")
 

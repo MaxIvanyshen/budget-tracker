@@ -2,11 +2,11 @@
 INSERT INTO users (
     name,
     email,
-    password,
+    password
 ) VALUES (
     sqlc.arg(name),
     sqlc.arg(email),
-    sqlc.arg(password),
+    sqlc.arg(password)
 ) RETURNING *;
 -- name: GetUserByEmail :one
 SELECT * FROM users WHERE email = sqlc.arg(email);

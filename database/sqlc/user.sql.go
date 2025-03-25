@@ -13,37 +13,28 @@ const createUser = `-- name: CreateUser :one
 INSERT INTO users (
     name,
     email,
-    password,
-    access_token
+    password
 ) VALUES (
     ?1,
     ?2,
-    ?3,
-    ?4
-) RETURNING id, name, email, password, access_token, created_at, updated_at
+    ?3
+) RETURNING id, name, email, password, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Name        string `db:"name" json:"name"`
-	Email       string `db:"email" json:"email"`
-	Password    string `db:"password" json:"password"`
-	AccessToken string `db:"access_token" json:"access_token"`
+	Name     string `db:"name" json:"name"`
+	Email    string `db:"email" json:"email"`
+	Password string `db:"password" json:"password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg *CreateUserParams) (*Users, error) {
-	row := q.queryRow(ctx, q.createUserStmt, createUser,
-		arg.Name,
-		arg.Email,
-		arg.Password,
-		arg.AccessToken,
-	)
+	row := q.queryRow(ctx, q.createUserStmt, createUser, arg.Name, arg.Email, arg.Password)
 	var i Users
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Email,
 		&i.Password,
-		&i.AccessToken,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -60,7 +51,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, password, access_token, created_at, updated_at FROM users WHERE email = ?1
+SELECT id, name, email, password, created_at, updated_at FROM users WHERE email = ?1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (*Users, error) {
@@ -71,7 +62,6 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (*Users, err
 		&i.Name,
 		&i.Email,
 		&i.Password,
-		&i.AccessToken,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -79,7 +69,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (*Users, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, email, password, access_token, created_at, updated_at FROM users WHERE id = ?1
+SELECT id, name, email, password, created_at, updated_at FROM users WHERE id = ?1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (*Users, error) {
@@ -90,7 +80,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (*Users, error) {
 		&i.Name,
 		&i.Email,
 		&i.Password,
-		&i.AccessToken,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -102,18 +91,16 @@ UPDATE users SET
     name = COALESCE(name, ?1),
     email = COALESCE(email, ?2),
     password = COALESCE(password, ?3),
-    access_token = COALESCE(access_token, ?4),
     updated_at = CURRENT_TIMESTAMP
-WHERE id = ?5
-RETURNING id, name, email, password, access_token, created_at, updated_at
+WHERE id = ?4
+RETURNING id, name, email, password, created_at, updated_at
 `
 
 type UpdateUserParams struct {
-	Name        string `db:"name" json:"name"`
-	Email       string `db:"email" json:"email"`
-	Password    string `db:"password" json:"password"`
-	AccessToken string `db:"access_token" json:"access_token"`
-	ID          int64  `db:"id" json:"id"`
+	Name     string `db:"name" json:"name"`
+	Email    string `db:"email" json:"email"`
+	Password string `db:"password" json:"password"`
+	ID       int64  `db:"id" json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (*Users, error) {
@@ -121,7 +108,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (*Users
 		arg.Name,
 		arg.Email,
 		arg.Password,
-		arg.AccessToken,
 		arg.ID,
 	)
 	var i Users
@@ -130,7 +116,6 @@ func (q *Queries) UpdateUser(ctx context.Context, arg *UpdateUserParams) (*Users
 		&i.Name,
 		&i.Email,
 		&i.Password,
-		&i.AccessToken,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

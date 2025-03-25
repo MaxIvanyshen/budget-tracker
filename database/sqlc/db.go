@@ -24,11 +24,44 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createTransactionStmt, err = db.PrepareContext(ctx, createTransaction); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateTransaction: %w", err)
+	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
+	if q.deleteTransactionByIDAndUserIDStmt, err = db.PrepareContext(ctx, deleteTransactionByIDAndUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteTransactionByIDAndUserID: %w", err)
+	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
+	}
+	if q.getLatestTransactionsByUserIDStmt, err = db.PrepareContext(ctx, getLatestTransactionsByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetLatestTransactionsByUserID: %w", err)
+	}
+	if q.getLatestTransactionsByUserIDAndTransactionTypeStmt, err = db.PrepareContext(ctx, getLatestTransactionsByUserIDAndTransactionType); err != nil {
+		return nil, fmt.Errorf("error preparing query GetLatestTransactionsByUserIDAndTransactionType: %w", err)
+	}
+	if q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt, err = db.PrepareContext(ctx, getTotalTransactionsByUserIDAndTransactionTypeForLastMonth); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTotalTransactionsByUserIDAndTransactionTypeForLastMonth: %w", err)
+	}
+	if q.getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt, err = db.PrepareContext(ctx, getTotalTransactionsByUserIDAndTransactionTypeForThisMonth); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTotalTransactionsByUserIDAndTransactionTypeForThisMonth: %w", err)
+	}
+	if q.getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt, err = db.PrepareContext(ctx, getTotalTransactionsThisYearByUserIDAndTransactionType); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTotalTransactionsThisYearByUserIDAndTransactionType: %w", err)
+	}
+	if q.getTransactionByIDStmt, err = db.PrepareContext(ctx, getTransactionByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTransactionByID: %w", err)
+	}
+	if q.getTransactionsByUserIDStmt, err = db.PrepareContext(ctx, getTransactionsByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTransactionsByUserID: %w", err)
+	}
+	if q.getTransactionsByUserIDAndTransactionTypeStmt, err = db.PrepareContext(ctx, getTransactionsByUserIDAndTransactionType); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTransactionsByUserIDAndTransactionType: %w", err)
+	}
+	if q.getTransactionsCountByUserIDAndTransactionTypeStmt, err = db.PrepareContext(ctx, getTransactionsCountByUserIDAndTransactionType); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTransactionsCountByUserIDAndTransactionType: %w", err)
 	}
 	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
@@ -44,14 +77,69 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createTransactionStmt != nil {
+		if cerr := q.createTransactionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createTransactionStmt: %w", cerr)
+		}
+	}
 	if q.createUserStmt != nil {
 		if cerr := q.createUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
+	if q.deleteTransactionByIDAndUserIDStmt != nil {
+		if cerr := q.deleteTransactionByIDAndUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteTransactionByIDAndUserIDStmt: %w", cerr)
+		}
+	}
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
+		}
+	}
+	if q.getLatestTransactionsByUserIDStmt != nil {
+		if cerr := q.getLatestTransactionsByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getLatestTransactionsByUserIDStmt: %w", cerr)
+		}
+	}
+	if q.getLatestTransactionsByUserIDAndTransactionTypeStmt != nil {
+		if cerr := q.getLatestTransactionsByUserIDAndTransactionTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getLatestTransactionsByUserIDAndTransactionTypeStmt: %w", cerr)
+		}
+	}
+	if q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt != nil {
+		if cerr := q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt: %w", cerr)
+		}
+	}
+	if q.getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt != nil {
+		if cerr := q.getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt: %w", cerr)
+		}
+	}
+	if q.getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt != nil {
+		if cerr := q.getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt: %w", cerr)
+		}
+	}
+	if q.getTransactionByIDStmt != nil {
+		if cerr := q.getTransactionByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTransactionByIDStmt: %w", cerr)
+		}
+	}
+	if q.getTransactionsByUserIDStmt != nil {
+		if cerr := q.getTransactionsByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTransactionsByUserIDStmt: %w", cerr)
+		}
+	}
+	if q.getTransactionsByUserIDAndTransactionTypeStmt != nil {
+		if cerr := q.getTransactionsByUserIDAndTransactionTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTransactionsByUserIDAndTransactionTypeStmt: %w", cerr)
+		}
+	}
+	if q.getTransactionsCountByUserIDAndTransactionTypeStmt != nil {
+		if cerr := q.getTransactionsCountByUserIDAndTransactionTypeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTransactionsCountByUserIDAndTransactionTypeStmt: %w", cerr)
 		}
 	}
 	if q.getUserByEmailStmt != nil {
@@ -106,23 +194,45 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                 DBTX
-	tx                 *sql.Tx
-	createUserStmt     *sql.Stmt
-	deleteUserStmt     *sql.Stmt
-	getUserByEmailStmt *sql.Stmt
-	getUserByIDStmt    *sql.Stmt
-	updateUserStmt     *sql.Stmt
+	db                                                             DBTX
+	tx                                                             *sql.Tx
+	createTransactionStmt                                          *sql.Stmt
+	createUserStmt                                                 *sql.Stmt
+	deleteTransactionByIDAndUserIDStmt                             *sql.Stmt
+	deleteUserStmt                                                 *sql.Stmt
+	getLatestTransactionsByUserIDStmt                              *sql.Stmt
+	getLatestTransactionsByUserIDAndTransactionTypeStmt            *sql.Stmt
+	getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt *sql.Stmt
+	getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt *sql.Stmt
+	getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt     *sql.Stmt
+	getTransactionByIDStmt                                         *sql.Stmt
+	getTransactionsByUserIDStmt                                    *sql.Stmt
+	getTransactionsByUserIDAndTransactionTypeStmt                  *sql.Stmt
+	getTransactionsCountByUserIDAndTransactionTypeStmt             *sql.Stmt
+	getUserByEmailStmt                                             *sql.Stmt
+	getUserByIDStmt                                                *sql.Stmt
+	updateUserStmt                                                 *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                 tx,
-		tx:                 tx,
-		createUserStmt:     q.createUserStmt,
-		deleteUserStmt:     q.deleteUserStmt,
-		getUserByEmailStmt: q.getUserByEmailStmt,
-		getUserByIDStmt:    q.getUserByIDStmt,
-		updateUserStmt:     q.updateUserStmt,
+		db:                                 tx,
+		tx:                                 tx,
+		createTransactionStmt:              q.createTransactionStmt,
+		createUserStmt:                     q.createUserStmt,
+		deleteTransactionByIDAndUserIDStmt: q.deleteTransactionByIDAndUserIDStmt,
+		deleteUserStmt:                     q.deleteUserStmt,
+		getLatestTransactionsByUserIDStmt:  q.getLatestTransactionsByUserIDStmt,
+		getLatestTransactionsByUserIDAndTransactionTypeStmt:            q.getLatestTransactionsByUserIDAndTransactionTypeStmt,
+		getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt: q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt,
+		getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt: q.getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt,
+		getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt:     q.getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt,
+		getTransactionByIDStmt:                             q.getTransactionByIDStmt,
+		getTransactionsByUserIDStmt:                        q.getTransactionsByUserIDStmt,
+		getTransactionsByUserIDAndTransactionTypeStmt:      q.getTransactionsByUserIDAndTransactionTypeStmt,
+		getTransactionsCountByUserIDAndTransactionTypeStmt: q.getTransactionsCountByUserIDAndTransactionTypeStmt,
+		getUserByEmailStmt:                                 q.getUserByEmailStmt,
+		getUserByIDStmt:                                    q.getUserByIDStmt,
+		updateUserStmt:                                     q.updateUserStmt,
 	}
 }

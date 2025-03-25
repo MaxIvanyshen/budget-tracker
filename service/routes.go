@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/MaxIvanyshen/budget-tracker/types"
@@ -61,6 +62,18 @@ func (s *Service) routes() []types.Route {
 			Auth:    true,
 		},
 		{
+			Method:  http.MethodPost,
+			Path:    "/expenses/create",
+			Handler: s.handleCreateExpense,
+			Auth:    true,
+		},
+		{
+			Method:  http.MethodPost,
+			Path:    "/expenses/delete/{id}",
+			Handler: s.handleDeleteExpense,
+			Auth:    true,
+		},
+		{
 			Method:  http.MethodGet,
 			Path:    "/contact",
 			Handler: s.handleContact,
@@ -95,20 +108,14 @@ func (s *Service) buildData(w http.ResponseWriter, r *http.Request) types.Data {
 		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get session", slog.Any("error", err))
 	}
 	id, ok := session.Values["userId"].(int64)
-	if !ok {
-		s.logger.LogAttrs(r.Context(), slog.LevelInfo, "No user ID in session")
-		if r.URL.Path != "/login" && r.URL.Path != "/signup" {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+	if ok {
+		user, err := s.queries.GetUserByID(r.Context(), id)
+		if err != nil {
+			s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get user", slog.Any("error", err))
 			return data
 		}
+		data.User = user
 	}
-	user, err := s.queries.GetUserByID(r.Context(), id)
-	if err != nil {
-		s.logger.LogAttrs(r.Context(), slog.LevelError, "Failed to get user", slog.Any("error", err))
-		return data
-	}
-
-	data.User = user
 
 	return data
 }
@@ -152,7 +159,12 @@ func (s *Service) handleUserRegistration(w http.ResponseWriter, r *http.Request)
 
 func (s *Service) handleDashboard(w http.ResponseWriter, r *http.Request) {
 	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	data.AdditionalData["firstname"] = strings.Split(data.User.Name, " ")[0]
+	data.AdditionalData["color"] = "yellow-400"
 	s.runTemplate(w, r, "dashboard", data)
 }
 
@@ -231,9 +243,80 @@ func (s *Service) handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) handleIncome(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "income", s.buildData(w, r))
+	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	s.runTemplate(w, r, "income", data)
 }
 
 func (s *Service) handleExpenses(w http.ResponseWriter, r *http.Request) {
-	s.runTemplate(w, r, "expenses", s.buildData(w, r))
+	ctx := r.Context()
+
+	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	expensePageInfo, err := s.getExpensesPageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get expenses page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	data.AdditionalData = expensePageInfo
+
+	s.runTemplate(w, r, "expenses", data)
+}
+
+func (s *Service) handleCreateExpense(w http.ResponseWriter, r *http.Request) {
+	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	ctx := r.Context()
+	r.ParseForm()
+	_, err := s.createExpense(ctx, data.User.ID, r.Form)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to create expense", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	expensePageInfo, err := s.getExpensesPageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get expenses page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	data.AdditionalData = expensePageInfo
+	s.runTemplate(w, r, "expense-list", data)
+}
+
+func (s *Service) handleDeleteExpense(w http.ResponseWriter, r *http.Request) {
+	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	id := r.PathValue("id")
+	s.logger.LogAttrs(r.Context(), slog.LevelInfo, "Deleting expense", slog.String("id", id))
+	ctx := r.Context()
+	transactionID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to parse transaction ID", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	err = s.deleteTransaction(ctx, data.User.ID, transactionID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to delete expense", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }

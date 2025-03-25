@@ -8,12 +8,22 @@ import (
 	"time"
 )
 
+type Transactions struct {
+	ID              int64     `db:"id" json:"id"`
+	UserID          int64     `db:"user_id" json:"user_id"`
+	Amount          int64     `db:"amount" json:"amount"`
+	Description     string    `db:"description" json:"description"`
+	TransactionType int64     `db:"transaction_type" json:"transaction_type"`
+	CreatedAt       time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
+	Category        *string   `db:"category" json:"category"`
+}
+
 type Users struct {
-	ID          int64     `db:"id" json:"id"`
-	Name        string    `db:"name" json:"name"`
-	Email       string    `db:"email" json:"email"`
-	Password    string    `db:"password" json:"password"`
-	AccessToken string    `db:"access_token" json:"access_token"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+	ID        int64     `db:"id" json:"id"`
+	Name      string    `db:"name" json:"name"`
+	Email     string    `db:"email" json:"email"`
+	Password  string    `db:"password" json:"password"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
