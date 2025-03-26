@@ -319,4 +319,13 @@ func (s *Service) handleDeleteExpense(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+
+	expensePageInfo, err := s.getExpensesPageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get expenses page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	data.AdditionalData = expensePageInfo
+	s.runTemplate(w, r, "expense-list", data)
 }
