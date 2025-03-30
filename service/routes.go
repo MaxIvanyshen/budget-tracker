@@ -56,6 +56,18 @@ func (s *Service) routes() []types.Route {
 			Auth:    true,
 		},
 		{
+			Method:  http.MethodPost,
+			Path:    "/income/create",
+			Handler: s.handleCreateIncome,
+			Auth:    true,
+		},
+		{
+			Method:  http.MethodDelete,
+			Path:    "/income/delete/{id}",
+			Handler: s.handleDeleteIncome,
+			Auth:    true,
+		},
+		{
 			Method:  http.MethodGet,
 			Path:    "/expenses",
 			Handler: s.handleExpenses,
@@ -68,7 +80,7 @@ func (s *Service) routes() []types.Route {
 			Auth:    true,
 		},
 		{
-			Method:  http.MethodPost,
+			Method:  http.MethodDelete,
 			Path:    "/expenses/delete/{id}",
 			Handler: s.handleDeleteExpense,
 			Auth:    true,
@@ -243,12 +255,82 @@ func (s *Service) handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) handleIncome(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	data := s.buildData(w, r)
 	if data.User == nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	s.runTemplate(w, r, "income", data)
+
+	incomePageInfo, err := s.getIncomePageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get income page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	data.AdditionalData = incomePageInfo
+
+	s.runTemplate(w, r, "incomes", data)
+}
+
+func (s *Service) handleCreateIncome(w http.ResponseWriter, r *http.Request) {
+	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	ctx := r.Context()
+	r.ParseForm()
+	_, err := s.createIncome(ctx, data.User.ID, r.Form)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to create income", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	incomePageInfo, err := s.getIncomePageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get income page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	data.AdditionalData = incomePageInfo
+	s.runTemplate(w, r, "income-list", data)
+}
+
+func (s *Service) handleDeleteIncome(w http.ResponseWriter, r *http.Request) {
+	data := s.buildData(w, r)
+	if data.User == nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	id := r.PathValue("id")
+	s.logger.LogAttrs(r.Context(), slog.LevelInfo, "Deleting income", slog.String("id", id))
+	ctx := r.Context()
+	transactionID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to parse transaction ID", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	err = s.deleteTransaction(ctx, data.User.ID, transactionID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to delete expense", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	incomePageInfo, err := s.getIncomePageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get expenses page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	data.AdditionalData = incomePageInfo
+	s.runTemplate(w, r, "income-list", data)
 }
 
 func (s *Service) handleExpenses(w http.ResponseWriter, r *http.Request) {

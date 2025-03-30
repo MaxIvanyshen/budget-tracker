@@ -1,0 +1,252 @@
+{{ block "incomes" .}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income | BudgetBuddy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+    {{ template "navbar" . }}
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-green-600 rounded-xl shadow-lg mb-8">
+            <div class="px-6 py-8 md:flex md:items-center md:justify-between">
+                <div class="text-white">
+                    <h1 class="text-2xl font-bold">Income Tracker</h1>
+                    <p class="mt-1 text-green-100">Track and manage your income sources</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <button id="add-income-btn" class="bg-white text-green-600 px-4 py-2 rounded-md font-medium hover:bg-green-50 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add New Income
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div id="income-form-container" class="lg:col-span-1 hidden">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-6">Add Income</h2>
+                    
+                    <form id="income-form" class="space-y-4" hx-post="/income/create" hx-target="#income-list-container">
+                        <div>
+                            <label for="income-amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number" name="amount" id="income-amount" step="0.01" required
+                                    class="focus:ring-green-500 focus:border-green-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="income-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                            <input type="text" name="date" id="income-date" required
+                                class="focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                placeholder="Select date">
+                        </div>
+                        
+                        <div>
+                            <label for="income-source" class="block text-sm font-medium text-gray-700 mb-1">Source</label>
+                            <select id="income-source" name="source" required
+                                class="focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="" disabled selected>Select source</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Freelance">Freelance</option>
+                                <option value="Investments">Investments</option>
+                                <option value="Gifts">Gifts</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div id="other-source-container" class="hidden">
+                            <label for="other-source" class="block text-sm font-medium text-gray-700 mb-1">Specify Source</label>
+                            <input type="text" name="other-source" id="other-source"
+                                class="focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                placeholder="Enter source">
+                        </div>
+                        
+                        <div>
+                            <label for="income-description" class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                            <textarea id="income-description" name="description" rows="3"
+                                class="focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                placeholder="Add notes about this income"></textarea>
+                        </div>
+                        
+                        <div class="pt-4 flex justify-end space-x-3">
+                            <button type="button" id="cancel-income-btn"
+                                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="bg-green-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Save Income
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {{ template "income-list" . }} 
+        </div>
+    </div>
+    
+    {{ template "footer" . }}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr("#income-date", {
+                dateFormat: "Y-m-d",
+                defaultDate: "today"
+            });
+            
+            const addIncomeBtn = document.getElementById('add-income-btn');
+            const cancelIncomeBtn = document.getElementById('cancel-income-btn');
+            const incomeFormContainer = document.getElementById('income-form-container');
+            const incomeListContainer = document.getElementById('income-list-container');
+            
+            addIncomeBtn.addEventListener('click', function() {
+                incomeFormContainer.classList.remove('hidden');
+                incomeListContainer.classList.remove('lg:col-span-3');
+                incomeListContainer.classList.add('lg:col-span-2');
+            });
+            
+            cancelIncomeBtn.addEventListener('click', function() {
+                incomeFormContainer.classList.add('hidden');
+                incomeListContainer.classList.remove('lg:col-span-2');
+                incomeListContainer.classList.add('lg:col-span-3');
+            });
+            
+            const incomeSource = document.getElementById('income-source');
+            const otherSourceContainer = document.getElementById('other-source-container');
+            
+            incomeSource.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    otherSourceContainer.classList.remove('hidden');
+                } else {
+                    otherSourceContainer.classList.add('hidden');
+                }
+            });
+            
+            const incomeForm = document.getElementById('income-form');
+        });
+    </script>
+</body>
+</html>
+{{end}}
+
+{{ block "income-list" . }}
+<div id="income-list-container" class="lg:col-span-3">
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Expense Summary</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-red-50 rounded-lg p-4">
+                <p class="text-sm text-gray-500">This Month</p>
+                <p class="text-2xl font-bold text-gray-900">${{ index .AdditionalData "totalThisMonth" }}</p>
+                {{ if (lt (index .AdditionalData "difference") 0)  }}
+                <p class="text-sm text-red-600 mt-1">
+                <i class="fas fa-arrow-up mr-1"></i>
+                <span>{{ index .AdditionalData "difference" }}% from last month</span>
+                </p>
+                {{ else }}
+                <p class="text-sm text-green-600 mt-1">
+                <i class="fas fa-arrow-down mr-1"></i>
+                <span>{{ index .AdditionalData "difference" }}% from last month</span>
+                </p>
+                {{ end }}
+            </div>
+
+            <div class="bg-blue-50 rounded-lg p-4">
+                <p class="text-sm text-gray-500">Last Month</p>
+                <p class="text-2xl font-bold text-gray-900">${{ index .AdditionalData "totalLastMonth" }}</p>
+            </div>
+
+            <div class="bg-indigo-50 rounded-lg p-4">
+                <p class="text-sm text-gray-500">Total this year</p>
+                <p class="text-2xl font-bold text-gray-900">${{ index .AdditionalData "year" }}</p>
+            </div>
+
+            <div class="bg-purple-50 rounded-lg p-4">
+                <p class="text-sm text-gray-500">Total logs this month</p>
+                <p class="text-2xl font-bold text-gray-900">{{ index .AdditionalData "count" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-lg font-bold text-gray-900">Expense Transactions</h2>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            ID
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Category
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Description
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Amount
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="expense-table" class="bg-white divide-y divide-gray-200">
+                    {{ range $index, $income := (index .AdditionalData "incomes") }}
+                    {{ template "income" $income }}
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{ block "income" . }}
+<tr id="income-{{ .ID }}">
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ .ID }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        {{ .UpdatedAt.Format "2006-01-02" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        <div class="flex items-center">
+            <div class="ml-3">
+                <div class="text-sm font-medium text-gray-900">{{ .Category }}</div>
+            </div>
+        </div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <div class="ml-3">
+            <div class="text-sm font-medium text-gray-900">{{ .Description }}</div>
+        </div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">
+        ${{ .Amount }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button class="text-red-600 hover:text-red-900" hx-trigger="click" hx-delete="/income/delete/{{ .ID }}" hx-target="#income-list-container">Delete</button>
+    </td>
+</tr>
+{{end}}
