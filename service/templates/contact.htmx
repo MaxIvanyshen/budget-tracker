@@ -9,13 +9,52 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://unpkg.com/htmx.org@1.9.10"></script>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
+        <style>
+            .parallax-header {
+                position: relative;
+                height: 400px;
+                overflow: hidden;
+            }
+            .parallax-bg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 150%;
+                background-image: url('https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80');
+                background-size: cover;
+                background-position: center;
+                transform: translateZ(-1px) scale(2);
+                z-index: -1;
+            }
+            .parallax-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(79, 70, 229, 0.85);
+                z-index: -1;
+            }
+            .parallax-content {
+                position: relative;
+                z-index: 1;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+        </style>
     </head>
     <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen flex flex-col overflow-x-hidden">
         {{ template "navbar" . }}
 
-        <div class="bg-indigo-700 text-white">
-            <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-                <div class="text-center">
+        <div class="parallax-header">
+            <div class="parallax-bg"></div>
+            <div class="parallax-overlay"></div>
+            <div class="parallax-content text-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h1 class="text-4xl font-extrabold sm:text-5xl sm:tracking-tight lg:text-6xl">Get in Touch</h1>
                     <p class="mt-6 max-w-2xl mx-auto text-xl">Have questions or feedback about BudgetBuddy? I'd love to hear from you.</p>
                 </div>
@@ -131,9 +170,23 @@
                             </form>
                         </div>
                     </div>
-
                 </div>
             </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.addEventListener('scroll', function() {
+                    const scrollPosition = window.scrollY;
+                    const parallaxBg = document.querySelector('.parallax-bg');
+                    
+                    // Move the background at a different rate than the scroll
+                    if (parallaxBg) {
+                        parallaxBg.style.transform = `translateY(${scrollPosition * 0.5}px)`;
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
 {{end}}
