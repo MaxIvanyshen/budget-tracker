@@ -175,8 +175,15 @@ func (s *Service) handleDashboard(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
+	ctx := r.Context()
+	pageContent, err := s.getDashboardPageInfo(ctx, data.User.ID)
+	if err != nil {
+		s.logger.LogAttrs(ctx, slog.LevelError, "Failed to get dashboard page info", slog.Any("error", err))
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	data.AdditionalData = pageContent
 	data.AdditionalData["firstname"] = strings.Split(data.User.Name, " ")[0]
-	data.AdditionalData["color"] = "yellow-400"
 	s.runTemplate(w, r, "dashboard", data)
 }
 

@@ -242,7 +242,7 @@
             <div class="text-sm font-medium text-gray-900">{{ .Description }}</div>
         </div>
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
         ${{ .Amount }}
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

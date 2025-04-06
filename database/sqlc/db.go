@@ -36,11 +36,23 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
+	if q.getCategorySummaryByUserIDStmt, err = db.PrepareContext(ctx, getCategorySummaryByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCategorySummaryByUserID: %w", err)
+	}
 	if q.getLatestTransactionsByUserIDStmt, err = db.PrepareContext(ctx, getLatestTransactionsByUserID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetLatestTransactionsByUserID: %w", err)
 	}
 	if q.getLatestTransactionsByUserIDAndTransactionTypeStmt, err = db.PrepareContext(ctx, getLatestTransactionsByUserIDAndTransactionType); err != nil {
 		return nil, fmt.Errorf("error preparing query GetLatestTransactionsByUserIDAndTransactionType: %w", err)
+	}
+	if q.getMonthlyOverviewByUserIDStmt, err = db.PrepareContext(ctx, getMonthlyOverviewByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMonthlyOverviewByUserID: %w", err)
+	}
+	if q.getTotalBalanceByUserIDStmt, err = db.PrepareContext(ctx, getTotalBalanceByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTotalBalanceByUserID: %w", err)
+	}
+	if q.getTotalBalanceForLastMonthByUserIDStmt, err = db.PrepareContext(ctx, getTotalBalanceForLastMonthByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTotalBalanceForLastMonthByUserID: %w", err)
 	}
 	if q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt, err = db.PrepareContext(ctx, getTotalTransactionsByUserIDAndTransactionTypeForLastMonth); err != nil {
 		return nil, fmt.Errorf("error preparing query GetTotalTransactionsByUserIDAndTransactionTypeForLastMonth: %w", err)
@@ -97,6 +109,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
 		}
 	}
+	if q.getCategorySummaryByUserIDStmt != nil {
+		if cerr := q.getCategorySummaryByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCategorySummaryByUserIDStmt: %w", cerr)
+		}
+	}
 	if q.getLatestTransactionsByUserIDStmt != nil {
 		if cerr := q.getLatestTransactionsByUserIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getLatestTransactionsByUserIDStmt: %w", cerr)
@@ -105,6 +122,21 @@ func (q *Queries) Close() error {
 	if q.getLatestTransactionsByUserIDAndTransactionTypeStmt != nil {
 		if cerr := q.getLatestTransactionsByUserIDAndTransactionTypeStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getLatestTransactionsByUserIDAndTransactionTypeStmt: %w", cerr)
+		}
+	}
+	if q.getMonthlyOverviewByUserIDStmt != nil {
+		if cerr := q.getMonthlyOverviewByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMonthlyOverviewByUserIDStmt: %w", cerr)
+		}
+	}
+	if q.getTotalBalanceByUserIDStmt != nil {
+		if cerr := q.getTotalBalanceByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTotalBalanceByUserIDStmt: %w", cerr)
+		}
+	}
+	if q.getTotalBalanceForLastMonthByUserIDStmt != nil {
+		if cerr := q.getTotalBalanceForLastMonthByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTotalBalanceForLastMonthByUserIDStmt: %w", cerr)
 		}
 	}
 	if q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt != nil {
@@ -200,8 +232,12 @@ type Queries struct {
 	createUserStmt                                                 *sql.Stmt
 	deleteTransactionByIDAndUserIDStmt                             *sql.Stmt
 	deleteUserStmt                                                 *sql.Stmt
+	getCategorySummaryByUserIDStmt                                 *sql.Stmt
 	getLatestTransactionsByUserIDStmt                              *sql.Stmt
 	getLatestTransactionsByUserIDAndTransactionTypeStmt            *sql.Stmt
+	getMonthlyOverviewByUserIDStmt                                 *sql.Stmt
+	getTotalBalanceByUserIDStmt                                    *sql.Stmt
+	getTotalBalanceForLastMonthByUserIDStmt                        *sql.Stmt
 	getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt *sql.Stmt
 	getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt *sql.Stmt
 	getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt     *sql.Stmt
@@ -222,17 +258,21 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createUserStmt:                     q.createUserStmt,
 		deleteTransactionByIDAndUserIDStmt: q.deleteTransactionByIDAndUserIDStmt,
 		deleteUserStmt:                     q.deleteUserStmt,
+		getCategorySummaryByUserIDStmt:     q.getCategorySummaryByUserIDStmt,
 		getLatestTransactionsByUserIDStmt:  q.getLatestTransactionsByUserIDStmt,
 		getLatestTransactionsByUserIDAndTransactionTypeStmt:            q.getLatestTransactionsByUserIDAndTransactionTypeStmt,
+		getMonthlyOverviewByUserIDStmt:                                 q.getMonthlyOverviewByUserIDStmt,
+		getTotalBalanceByUserIDStmt:                                    q.getTotalBalanceByUserIDStmt,
+		getTotalBalanceForLastMonthByUserIDStmt:                        q.getTotalBalanceForLastMonthByUserIDStmt,
 		getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt: q.getTotalTransactionsByUserIDAndTransactionTypeForLastMonthStmt,
 		getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt: q.getTotalTransactionsByUserIDAndTransactionTypeForThisMonthStmt,
 		getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt:     q.getTotalTransactionsThisYearByUserIDAndTransactionTypeStmt,
-		getTransactionByIDStmt:                             q.getTransactionByIDStmt,
-		getTransactionsByUserIDStmt:                        q.getTransactionsByUserIDStmt,
-		getTransactionsByUserIDAndTransactionTypeStmt:      q.getTransactionsByUserIDAndTransactionTypeStmt,
-		getTransactionsCountByUserIDAndTransactionTypeStmt: q.getTransactionsCountByUserIDAndTransactionTypeStmt,
-		getUserByEmailStmt:                                 q.getUserByEmailStmt,
-		getUserByIDStmt:                                    q.getUserByIDStmt,
-		updateUserStmt:                                     q.updateUserStmt,
+		getTransactionByIDStmt:                                         q.getTransactionByIDStmt,
+		getTransactionsByUserIDStmt:                                    q.getTransactionsByUserIDStmt,
+		getTransactionsByUserIDAndTransactionTypeStmt:                  q.getTransactionsByUserIDAndTransactionTypeStmt,
+		getTransactionsCountByUserIDAndTransactionTypeStmt:             q.getTransactionsCountByUserIDAndTransactionTypeStmt,
+		getUserByEmailStmt:                                             q.getUserByEmailStmt,
+		getUserByIDStmt:                                                q.getUserByIDStmt,
+		updateUserStmt:                                                 q.updateUserStmt,
 	}
 }

@@ -76,6 +76,51 @@ func (q *Queries) DeleteTransactionByIDAndUserID(ctx context.Context, arg *Delet
 	return err
 }
 
+const getCategorySummaryByUserID = `-- name: GetCategorySummaryByUserID :many
+SELECT 
+    category,
+    SUM(amount) as total_amount
+FROM 
+    transactions
+WHERE 
+    transaction_type = 2
+    AND strftime('%m', updated_at) = strftime('%m', 'now')
+    AND strftime('%Y', updated_at) = strftime('%Y', 'now')
+    AND user_id = ?1
+GROUP BY 
+    category
+ORDER BY 
+    total_amount DESC
+`
+
+type GetCategorySummaryByUserIDRow struct {
+	Category    *string  `db:"category" json:"category"`
+	TotalAmount *float64 `db:"total_amount" json:"total_amount"`
+}
+
+func (q *Queries) GetCategorySummaryByUserID(ctx context.Context, userID int64) ([]*GetCategorySummaryByUserIDRow, error) {
+	rows, err := q.query(ctx, q.getCategorySummaryByUserIDStmt, getCategorySummaryByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []*GetCategorySummaryByUserIDRow{}
+	for rows.Next() {
+		var i GetCategorySummaryByUserIDRow
+		if err := rows.Scan(&i.Category, &i.TotalAmount); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getLatestTransactionsByUserID = `-- name: GetLatestTransactionsByUserID :many
 SELECT id, user_id, amount, description, transaction_type, created_at, updated_at, category FROM transactions WHERE user_id = ?1 ORDER BY updated_at DESC
 `
@@ -151,6 +196,109 @@ func (q *Queries) GetLatestTransactionsByUserIDAndTransactionType(ctx context.Co
 		return nil, err
 	}
 	return items, nil
+}
+
+const getMonthlyOverviewByUserID = `-- name: GetMonthlyOverviewByUserID :many
+WITH months AS (
+    SELECT 
+        datetime('now', '-3 months', 'start of month') AS month_start
+    UNION SELECT 
+        datetime('now', '-2 months', 'start of month')
+    UNION SELECT 
+        datetime('now', '-1 month', 'start of month')
+    UNION SELECT 
+        datetime('now', 'start of month')
+    UNION SELECT 
+        datetime('now', '+1 month', 'start of month')
+    UNION SELECT 
+        datetime('now', '+2 months', 'start of month')
+)
+
+SELECT 
+    strftime('%m', months.month_start) AS month_num,
+    CASE 
+        WHEN strftime('%m', months.month_start) = '01' THEN 'Jan'
+        WHEN strftime('%m', months.month_start) = '02' THEN 'Feb'
+        WHEN strftime('%m', months.month_start) = '03' THEN 'Mar'
+        WHEN strftime('%m', months.month_start) = '04' THEN 'Apr'
+        WHEN strftime('%m', months.month_start) = '05' THEN 'May'
+        WHEN strftime('%m', months.month_start) = '06' THEN 'Jun'
+        WHEN strftime('%m', months.month_start) = '07' THEN 'Jul'
+        WHEN strftime('%m', months.month_start) = '08' THEN 'Aug'
+        WHEN strftime('%m', months.month_start) = '09' THEN 'Sep'
+        WHEN strftime('%m', months.month_start) = '10' THEN 'Oct'
+        WHEN strftime('%m', months.month_start) = '11' THEN 'Nov'
+        WHEN strftime('%m', months.month_start) = '12' THEN 'Dec'
+    END AS month_name,
+    COALESCE(SUM(CASE WHEN t.transaction_type = 1 THEN t.amount ELSE 0 END), 0) AS income,
+    COALESCE(SUM(CASE WHEN t.transaction_type = 2 THEN t.amount ELSE 0 END), 0) AS expenses
+FROM 
+    months
+LEFT JOIN 
+    transactions t ON strftime('%Y-%m', t.updated_at) = strftime('%Y-%m', months.month_start)
+WHERE 
+    t.user_id = ?1
+GROUP BY 
+    month_num, month_name
+ORDER BY 
+    strftime('%Y-%m', months.month_start)
+`
+
+type GetMonthlyOverviewByUserIDRow struct {
+	MonthNum  interface{} `db:"month_num" json:"month_num"`
+	MonthName interface{} `db:"month_name" json:"month_name"`
+	Income    interface{} `db:"income" json:"income"`
+	Expenses  interface{} `db:"expenses" json:"expenses"`
+}
+
+func (q *Queries) GetMonthlyOverviewByUserID(ctx context.Context, userID int64) ([]*GetMonthlyOverviewByUserIDRow, error) {
+	rows, err := q.query(ctx, q.getMonthlyOverviewByUserIDStmt, getMonthlyOverviewByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []*GetMonthlyOverviewByUserIDRow{}
+	for rows.Next() {
+		var i GetMonthlyOverviewByUserIDRow
+		if err := rows.Scan(
+			&i.MonthNum,
+			&i.MonthName,
+			&i.Income,
+			&i.Expenses,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTotalBalanceByUserID = `-- name: GetTotalBalanceByUserID :one
+SELECT SUM(CASE WHEN transaction_type = 1 THEN amount ELSE -amount END) AS total_balance FROM transactions WHERE user_id = ?1
+`
+
+func (q *Queries) GetTotalBalanceByUserID(ctx context.Context, userID int64) (*float64, error) {
+	row := q.queryRow(ctx, q.getTotalBalanceByUserIDStmt, getTotalBalanceByUserID, userID)
+	var total_balance *float64
+	err := row.Scan(&total_balance)
+	return total_balance, err
+}
+
+const getTotalBalanceForLastMonthByUserID = `-- name: GetTotalBalanceForLastMonthByUserID :one
+SELECT SUM(CASE WHEN transaction_type = 1 THEN amount ELSE -amount END) AS total_balance FROM transactions WHERE user_id = ?1 AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now', '-1 month')
+`
+
+func (q *Queries) GetTotalBalanceForLastMonthByUserID(ctx context.Context, userID int64) (*float64, error) {
+	row := q.queryRow(ctx, q.getTotalBalanceForLastMonthByUserIDStmt, getTotalBalanceForLastMonthByUserID, userID)
+	var total_balance *float64
+	err := row.Scan(&total_balance)
+	return total_balance, err
 }
 
 const getTotalTransactionsByUserIDAndTransactionTypeForLastMonth = `-- name: GetTotalTransactionsByUserIDAndTransactionTypeForLastMonth :one

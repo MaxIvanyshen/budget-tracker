@@ -13,8 +13,12 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg *CreateUserParams) (*Users, error)
 	DeleteTransactionByIDAndUserID(ctx context.Context, arg *DeleteTransactionByIDAndUserIDParams) error
 	DeleteUser(ctx context.Context, id int64) error
+	GetCategorySummaryByUserID(ctx context.Context, userID int64) ([]*GetCategorySummaryByUserIDRow, error)
 	GetLatestTransactionsByUserID(ctx context.Context, userID int64) ([]*Transactions, error)
 	GetLatestTransactionsByUserIDAndTransactionType(ctx context.Context, arg *GetLatestTransactionsByUserIDAndTransactionTypeParams) ([]*Transactions, error)
+	GetMonthlyOverviewByUserID(ctx context.Context, userID int64) ([]*GetMonthlyOverviewByUserIDRow, error)
+	GetTotalBalanceByUserID(ctx context.Context, userID int64) (*float64, error)
+	GetTotalBalanceForLastMonthByUserID(ctx context.Context, userID int64) (*float64, error)
 	GetTotalTransactionsByUserIDAndTransactionTypeForLastMonth(ctx context.Context, arg *GetTotalTransactionsByUserIDAndTransactionTypeForLastMonthParams) (*float64, error)
 	GetTotalTransactionsByUserIDAndTransactionTypeForThisMonth(ctx context.Context, arg *GetTotalTransactionsByUserIDAndTransactionTypeForThisMonthParams) (*float64, error)
 	GetTotalTransactionsThisYearByUserIDAndTransactionType(ctx context.Context, arg *GetTotalTransactionsThisYearByUserIDAndTransactionTypeParams) (*float64, error)
