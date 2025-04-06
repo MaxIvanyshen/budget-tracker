@@ -185,15 +185,15 @@
             <div class="bg-red-50 rounded-lg p-4">
                 <p class="text-sm text-gray-500">This Month</p>
                 <p class="text-2xl font-bold text-gray-900">${{ index .AdditionalData "totalThisMonth" }}</p>
-                {{ if (gt (index .AdditionalData "difference") 0)  }}
+                {{ if (gt (index .AdditionalData "difference") 0.0)  }}
                 <p class="text-sm text-red-600 mt-1">
                 <i class="fas fa-arrow-up mr-1"></i>
-                <span>{{ index .AdditionalData "difference" }}% from last month</span>
+                <span>{{ formatFloat (index .AdditionalData "difference") }}% from last month</span>
                 </p>
                 {{ else }}
                 <p class="text-sm text-green-600 mt-1">
                 <i class="fas fa-arrow-down mr-1"></i>
-                <span>{{ index .AdditionalData "difference" }}% from last month</span>
+                <span>{{ formatFloat (index .AdditionalData "difference") }}% from last month</span>
                 </p>
                 {{ end }}
             </div>

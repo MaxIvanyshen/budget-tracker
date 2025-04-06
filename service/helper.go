@@ -73,7 +73,7 @@ func (s *Service) getExpensesPageInfo(ctx context.Context, userID int64) (map[st
 		"totalLastMonth": *totalLastMonth,
 		"count":          count,
 		"year":           *year,
-		"difference":     int64(differenceInPercent),
+		"difference":     differenceInPercent,
 		"expenses":       expenses,
 	}, nil
 }
@@ -143,7 +143,7 @@ func (s *Service) getIncomePageInfo(ctx context.Context, userID int64) (map[stri
 		"totalLastMonth": *totalLastMonth,
 		"count":          count,
 		"year":           *year,
-		"difference":     int64(differenceInPercent),
+		"difference":     differenceInPercent,
 		"incomes":        incomes,
 	}, nil
 }

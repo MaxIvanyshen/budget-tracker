@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -42,10 +43,13 @@ func Start(router *http.ServeMux, logger *slog.Logger, db *sql.DB) {
 		"toJSON": func(v any) string {
 			b, err := json.Marshal(v)
 			if err != nil {
-				// Handle error appropriately
+				svc.logger.LogAttrs(context.Background(), slog.LevelError, "Failed to marshal to JSON", slog.Any("error", err))
 				return ""
 			}
 			return string(b)
+		},
+		"formatFloat": func(f float64) string {
+			return fmt.Sprintf("%.2f", f)
 		},
 	})
 
