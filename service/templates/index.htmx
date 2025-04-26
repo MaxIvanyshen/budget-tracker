@@ -230,15 +230,32 @@
     </div>
     {{ template "footer" . }}
 
-    <script>
+     <script>
         window.addEventListener('scroll', function() {
             const textContainer = document.getElementById('hero-text-container');
             const imageContainer = document.getElementById('hero-image-container');
             const scrollPosition = window.scrollY;
-            const speed = 0.5;
+            const moveSpeed = 0.5; // Controls how fast elements move horizontally
+            const fadeStart = 100; // Scroll position (in pixels) to start fading
+            const fadeDuration = 300; // Scroll distance (in pixels) over which the fade happens
 
-            textContainer.style.transform = 'translateX(' + -scrollPosition * speed + 'px)';
-            imageContainer.style.transform = 'translateX(' + scrollPosition * speed + 'px)';
+            const textTranslateX = -scrollPosition * moveSpeed;
+            textContainer.style.transform = 'translateX(' + textTranslateX + 'px)';
+
+            let textOpacity = 1;
+            if (scrollPosition > fadeStart) {
+                textOpacity = 1 - Math.min(1, (scrollPosition - fadeStart) / fadeDuration);
+            }
+            textContainer.style.opacity = textOpacity;
+
+            const imageTranslateX = scrollPosition * moveSpeed;
+            imageContainer.style.transform = 'translateX(' + imageTranslateX + 'px)';
+
+            let imageOpacity = 1;
+            if (scrollPosition > fadeStart) {
+                 imageOpacity = 1 - Math.min(1, (scrollPosition - fadeStart) / fadeDuration);
+            }
+            imageContainer.style.opacity = imageOpacity;
         });
     </script>
 </body>
