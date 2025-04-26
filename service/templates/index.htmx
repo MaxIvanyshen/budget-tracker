@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%234f46e5%22 d=%22M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64H80c-8.8 0-16-7.2-16-16s7.2-16 16-16H448c17.7 0 32-14.3 32-32s-14.3-32-32-32H64zM416 272a32 32 0 1 1 0 64 32 32 0 1 1 0-64z%22/></svg>">
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    <style>
+        .parallax-element {
+            will-change: transform; /* Optimize for animation */
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
     {{ template "navbar" . }}
@@ -16,26 +21,30 @@
         <div class="max-w-7xl mx-auto">
             <div class="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
                 <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-                    <div class="sm:text-center lg:text-left">
-                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                            <span class="block">Take control of your</span>
-                            <span class="block text-indigo-600">financial future</span>
-                        </h1>
-                        <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                            BudgetBuddy helps you track expenses, manage budgets, and reach your financial goals. Simple, intuitive, and powerful.
-                        </p>
-                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                            <div class="rounded-md shadow">
-                                <a href="/signup" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
-                                    Get started
-                                </a>
+                    {{/* Added container for parallax effect */}}
+                    <div id="hero-text-container" class="parallax-element"> {{/* Added ID and class */}}
+                        <div class="sm:text-center lg:text-left">
+                            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                                <span class="block">Take control of your</span>
+                                <span class="block text-indigo-600">financial future</span>
+                            </h1>
+                            <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                                BudgetBuddy helps you track expenses, manage budgets, and reach your financial goals. Simple, intuitive, and powerful.
+                            </p>
+                            <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                                <div class="rounded-md shadow">
+                                    <a href="/signup" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
+                                        Get started
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </div>
-        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+        {{/* Added ID and class for parallax effect */}}
+        <div id="hero-image-container" class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 parallax-element">
             <img class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full" src="https://images.unsplash.com/photo-1520333789090-1afc82db536a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80" alt="Budget planning">
         </div>
     </div>
@@ -103,7 +112,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="bg-green-50 rounded-lg p-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-2">Top Categories</h3>
                             <div class="space-y-3">
@@ -130,7 +139,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="bg-blue-50 rounded-lg p-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-2">Savings Goals</h3>
                             <div class="space-y-4">
@@ -155,7 +164,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mt-8 bg-gray-50 rounded-lg p-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Transactions</h3>
                         <div class="overflow-hidden">
@@ -220,6 +229,19 @@
         </div>
     </div>
     {{ template "footer" . }}
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const textContainer = document.getElementById('hero-text-container');
+            const imageContainer = document.getElementById('hero-image-container');
+            const scrollPosition = window.scrollY;
+            const speed = 0.5;
+
+            textContainer.style.transform = 'translateX(' + -scrollPosition * speed + 'px)';
+            imageContainer.style.transform = 'translateX(' + scrollPosition * speed + 'px)';
+        });
+    </script>
 </body>
 </html>
 {{end}}
+

@@ -46,7 +46,7 @@
                     </div>
                     {{ else }}
                     <div class="mt-3 text-sm text-green-600">
-                            <i class="fas fa-arrow-down mr-1"></i>
+                            <i class="fas fa-arrow-up mr-1"></i>
                         <span>{{ formatFloat (index .AdditionalData "balanceDiff") }}% from last month</span>
                     </div>
                     {{ end }}
@@ -64,12 +64,12 @@
                 </div>
                     {{ if lt (index .AdditionalData "incomeDiff") 0.0 }}
                     <div class="mt-3 text-sm text-red-600">
-                        <i class="fas fa-arrow-up mr-1"></i>
+                        <i class="fas fa-arrow-down mr-1"></i>
                         <span>{{ formatFloat (index .AdditionalData "incomeDiff") }}% from last month</span>
                     </div>
                     {{ else }}
                     <div class="mt-3 text-sm text-green-600">
-                        <i class="fas fa-arrow-down mr-1"></i>
+                        <i class="fas fa-arrow-up mr-1"></i>
                         <span>{{ formatFloat (index .AdditionalData "incomeDiff") }}% from last month</span>
                     </div>
                     {{ end }}
